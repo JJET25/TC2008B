@@ -88,35 +88,55 @@ function smiley(radius: number) : twgl.Arrays {
     const colorData: number[] = [];
     const indexData: number[] = [];
 
-    // TODO: Create you own shape for a smiley face
-    //  - Add coordinates as pairs of elements into the positionData array
-    //  - Add color values as 3 values (RBG) into the colorData array
-    //  - Add index for the order in which vertices are connected, 3 values for each triangle
-    // HINT: You can use polar coordinates to define the positions of vertices,
-    // using the radius and an angle. Then convert them to polar coordinates.
+    // Cara muy sencilla: cabeza amarilla de 16 lados (casi un círculo),
+    // un triángulo negro por ojo y un triángulo negro para la boca.
+    // Lo que se agrega después se dibuja encima de lo anterior.
 
-    // Sample data for a single yellow triangle. Replace with your values.
-    positionData.push(0, 100);
-    positionData.push(-120, -100);
-    positionData.push(120, -100);
-    colorData.push(0.9, 0.8, 0, 1);
-    colorData.push(0.9, 0.8, 0, 1);
-    colorData.push(0.9, 0.8, 0, 1);
+    // ----- CABEZA: 16 triángulos que comparten el punto del centro -----
+    const sides = 16;               // más lados = más redonda
+    const yellow = [1, 0.85, 0, 1];
 
-    indexData.push(0, 2, 1);
+    // Vértice 0: el centro
+    positionData.push(0, 0);
+    colorData.push(...yellow);
 
+    // Vértices del borde: x = radio*cos(ángulo), y = radio*sin(ángulo)
+    for (let i = 0; i <= sides; i++) {
+        const angle = 2 * Math.PI * i / sides;
+        positionData.push(radius * Math.cos(angle), radius * Math.sin(angle));
+        colorData.push(...yellow);
+    }
 
+    // Un triángulo por rebanada: centro, punto del borde, siguiente punto
+    for (let i = 1; i <= sides; i++) {
+        indexData.push(0, i, i + 1);
+    }
 
+    // ----- OJOS Y BOCA: un triángulo cada uno -----
+    const black = [0, 0, 0, 1];
+    const r = radius;
 
+    // Agrega un triángulo negro con sus 3 puntos (x1,y1, x2,y2, x3,y3)
+    function addTriangle(points: number[]): void {
+        const first = positionData.length / 2;   // index of its first vertex
+        positionData.push(...points);
+        colorData.push(...black, ...black, ...black);
+        indexData.push(first, first + 1, first + 2);
+    }
 
-    // Build the final object with the arrays for positions, colors, and indices
+    // Ojo izquierdo y ojo derecho
+    addTriangle([-0.45 * r, 0.20 * r,  -0.25 * r, 0.20 * r,  -0.35 * r, 0.45 * r]);
+    addTriangle([ 0.25 * r, 0.20 * r,   0.45 * r, 0.20 * r,   0.35 * r, 0.45 * r]);
+
+    // Boca: triángulo ancho que apunta hacia abajo (sonrisa)
+    addTriangle([-0.50 * r, -0.20 * r,  0.50 * r, -0.20 * r,  0, -0.60 * r]);
+
+    // Objeto final: posiciones, colores e índices
     const arrays: twgl.Arrays = {
         a_position: { numComponents: 2, data: positionData },
         a_color:    { numComponents: 4, data: colorData },
         indices:    { numComponents: 3, data: indexData },
     };
-
-    console.log(arrays);
 
     return arrays;
 }
