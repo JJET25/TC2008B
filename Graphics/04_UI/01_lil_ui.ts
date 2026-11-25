@@ -15,7 +15,7 @@ import { shapeF, shapeF_centered } from '../libs/shapes.js';
 import GUI from 'lil-gui';
 import { V2, M3 } from '../libs/2d-lib.js';
 
-
+/*
 // Define the shader code, using GLSL 3.00
 
 const vsGLSL = `#version 300 es
@@ -54,6 +54,7 @@ void main() {
     outColor = u_color;
 }
 `;
+*/
 
 
 // Import the shaders from external files
